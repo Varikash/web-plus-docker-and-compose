@@ -1,3 +1,6 @@
 # Фронтенд для проекта КупиПодариДай
 
 
+IP адрес x.x.x.x
+Frontend https://...
+Backend https://...
