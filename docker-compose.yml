@@ -1,0 +1,59 @@
+services:
+  backend:
+    container_name: 'kupislona-backend'
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    image: 'backend-kpd'
+    restart: on-failure
+    env_file: .env
+    ports:
+      - '4000:3000'
+# чтобы не поднялся раньше бд и не упал
+    depends_on:
+      - postgres
+    # restart: on-failure
+    networks:
+      - backend
+
+  postgres:
+    container_name: 'postgres'
+    image: postgres:alpine
+    restart: on-failure
+    env_file: .env
+    ports:
+      - '5432:5432'
+    volumes:
+# папка по умолчанию но можно задать свою создав предварительно переменную окружения
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  frontend:
+    container_name: 'kupislona-frontend'
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    image: 'frontend-kpd'
+    restart: on-failure
+    env_file: .env
+    ports:
+      - '8081:80'
+    networks:
+      - frontend
+
+  adminer:
+    image: adminer
+    restart: on-failure
+    ports:
+      - '8080:8080'
+    networks:
+      - backend
+# необбходимы сети для контейнеров чтобы обезопасить контейнеры, фронт не должен взаимодействовать с бд
+networks:
+  backend:
+  frontend:
+
+#для postgres нужно создать volume чтобы данные не терялись при перезапуске контейнера
+volumes:
+  pgdata:
